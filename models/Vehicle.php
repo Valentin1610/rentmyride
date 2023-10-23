@@ -108,17 +108,42 @@ class Vehicle
         $this->id_types = $id_types;
     }
 
-    public static function get_all($order): array
+    public static function get_all(string $order = "ASC", int $id_types = 0, string $searchs = '', int $page = 1, bool $all = false): array
     {
+        $offset = ($page - 1) * NB_ELEMENTS_PER_PAGE;
         $pdo = connect();
         $sql = "SELECT * 
         FROM `vehicles` 
         INNER JOIN `types` ON `vehicles`.`id_types` = `types`.`id_types`
-        WHERE `vehicles` . `deleted_at` IS NULL 
-        ORDER BY `vehicles`. `brand` $order ;";
-        $sth = $pdo->query($sql);
+        WHERE `vehicles`.`deleted_at` IS NULL";
+        if (!empty($searchs)) {
+            $sql = $sql . " AND (`vehicles`.`brand` LIKE :searchs OR `vehicles`.`model` LIKE :searchs)";
+        }
+
+        if ($id_types != 0) {
+            $sql = $sql . " AND `types`.`id_types` = :id_types";
+        }
+        $sql = $sql . " ORDER BY `vehicles`.`id_types` $order, `vehicles`.`brand` $order, `vehicles`.`model` $order";
+
+        if ($all == false) {
+            $sql = $sql . " LIMIT :limit OFFSET :offset ;";
+        }
+
+        $sth = $pdo->prepare($sql);
+
+        if ($id_types != 0) {
+            $sth->bindValue(':id_types', $id_types, PDO::PARAM_INT);
+        }
+
+        if (!empty($searchs)) {
+            $sth->bindValue(':searchs', '%' . $searchs . '%');
+        }
+        if ($all == false) {
+            $sth->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $sth->bindValue(':limit', NB_ELEMENTS_PER_PAGE, PDO::PARAM_INT);
+        }
         $sth->execute();
-        $result = $sth->fetchAll();
+        $result = $sth->fetchAll(PDO::FETCH_OBJ);
 
         return $result;
     }
@@ -152,7 +177,7 @@ class Vehicle
         return $result;
     }
 
-    public function update() : bool
+    public function update(): bool
     {
         $pdo = connect();
         $sql = "UPDATE `vehicles` 
@@ -163,7 +188,7 @@ class Vehicle
         `picture` =:picture,
         `id_types` = :id_types
         WHERE `id_vehicles`= :id_vehicles;";
-        $sth= $pdo->prepare($sql);
+        $sth = $pdo->prepare($sql);
         $sth->bindValue(':id_vehicles', $this->get_id_vehicles(), PDO::PARAM_INT);
         $sth->bindValue(':brand', $this->get_brand());
         $sth->bindValue(':model', $this->get_model());
@@ -174,22 +199,22 @@ class Vehicle
         return $sth->execute();
     }
 
-    public static function archive(int $id_vehicles) : bool
+    public static function archive(int $id_vehicles): bool
     {
         $pdo = connect();
-        $sql= "UPDATE `vehicles`
+        $sql = "UPDATE `vehicles`
         SET `deleted_at` = NOW() 
         WHERE `id_vehicles` = :id_vehicles ;";
-        $sth= $pdo->prepare($sql);
+        $sth = $pdo->prepare($sql);
         $sth->bindValue(':id_vehicles', $id_vehicles);
         $sth->execute();
 
         return (bool) $sth->rowCount();
     }
 
-    public static function get_archive(string $order) : array
+    public static function get_archive(string $order): array
     {
-        $pdo =connect();
+        $pdo = connect();
         $sql = "SELECT *
         FROM `vehicles` 
         INNER JOIN `types` ON `vehicles`.`id_types` = `types`. `id_types`
@@ -202,9 +227,9 @@ class Vehicle
         return $result;
     }
 
-    public static function restore(string $order) :array
+    public static function restore(string $order): array
     {
-    
+
         $pdo = connect();
         $sql = "SELECT `vehicles`. *, `types`. `type`
         FROM `vehicles`
@@ -212,17 +237,10 @@ class Vehicle
         ON `vehicles`. `id_vehicles` = `types`. `id_types`
         WHERE `deleted_at` IS NULL 
         ORDER BY `types`. `type`, `vehicles`.$order ;";
-        $sth= $pdo->prepare($sql);
+        $sth = $pdo->prepare($sql);
         $sth->execute();
         $result = $sth->fetchAll();
 
         return $result;
     }
-
-    // public static function delete(int $id_vehicles) : bool{
-    //     $pdo = connect();
-    //     $sql = 'DELETE FROM `vehicles` WHERE `id_vehicles` = :id_vehicles;';
-    //     $sth = $pdo->prepare($sql);
-    //     $sth-> bindValue(':id_vehicles', $id_vehicles, PDO::PARAM_INT);
-    // }
 }

@@ -10,8 +10,6 @@ $errors = [];
 try {
     $types = Type::getAll();
 
-    
-
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $picture= $_FILES['picture'];
         $brand = filter_input(INPUT_POST, 'brand', FILTER_SANITIZE_SPECIAL_CHARS);

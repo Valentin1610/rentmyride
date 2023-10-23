@@ -10,3 +10,4 @@ define('USER', 'user_admin');
 define('PASSWORD', 'lhYM0b[WD(z1nCUy');
 define('VALIDATE_EXTENSIONS', ['image/png','image/jpeg', 'imag/jpg']);
 define('FILE_SIZE', 4 * 1000 * 1000);
+define('NB_ELEMENTS_PER_PAGE', 9);

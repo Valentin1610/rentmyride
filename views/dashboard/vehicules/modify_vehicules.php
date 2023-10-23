@@ -36,9 +36,9 @@
                 <div class="form-group mt-5">
                     <label class="form-label" for="picture">Image du véhicule</label>
                     <input type="file" class="form-control" name="picture" id="picture">
-                    <?php if($vehicle->picture) { ?>
-                        <div><img class ="w-25" src="/public/uploads/vehicles/<?= $vehicle->picture ?>" class="thumb mt-2"></div>
-                        <?php } ?>
+                    <?php if ($vehicle->picture) { ?>
+                        <div><img class="w-25" src="/public/uploads/vehicles/<?= $vehicle->picture ?>" class="thumb mt-2" alt='<?= $vehicle->picture?>'></div>
+                    <?php } ?>
                     <p><?= $errors['picture'] ?? '' ?></p>
                 </div>
             </div>
@@ -46,11 +46,14 @@
         <div class="form-group mt-5">
             <label for="types" class="form-label">Catégorie du vehicule*</label>
             <select name="types" id="types" class="form-select" required>
+                <option value="">--Sélectionnez une catégorie--</option>
                 <?php
-                foreach($types as $key => $type){
-                    $isSelected = ($vehicle->id_vehicles == $type->id_types) ? 'selected ' : '';
-                    echo '<option ' . $isSelected . ' value="' . $type->id_types . '" >' . $type->type . '</option>';
-                } ?>
+                foreach ($types as $type) { ?>
+                    <?php $isSelected = ($id_types == $type->id_types ? 'selected' : '') ?>
+                    <option value="<?= $vehicle->id_types ?>"><?= $isSelected ?>
+                        <?= $type->type ?>
+                    <?php } ?>
+                    </option>
             </select>
         </div>
         <div class="form-group mt-5">

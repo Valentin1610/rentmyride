@@ -50,8 +50,6 @@ class Type
 
         return (bool) $result;
     }
-
-    
     
     public static function getAll(): array
     {

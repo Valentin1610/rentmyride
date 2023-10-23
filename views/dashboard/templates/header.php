@@ -33,6 +33,9 @@
                     <div class="p-2">
                         <a href='/controllers/dashboard/vehicules/list_vehicules-ctrl.php'>Afficher la liste des véhicules</a>
                     </div>
+                    <div class="p-2">
+                        <a href='/controllers/home-ctrl.php'>Retour sur le site</a>
+                    </div>
                 </div>
             </div>
         </nav>

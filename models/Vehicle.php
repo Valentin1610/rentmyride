@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../config/databaseController.php';
-require_once __DIR__ . '/../config/regex.php';
 
 class Vehicle
 {
@@ -10,10 +9,10 @@ class Vehicle
     private string $model;
     private string $registration;
     private int $mileage;
-    private string $picture;
+    private ?string $picture;
     private DateTime $created_at;
     private DateTime $updated_at;
-    private DateTime $deleted_at;
+    private ?DateTime $deleted_at;
     private int $id_types;
 
     // Recuperer l'ID de la table vehicles
@@ -24,28 +23,28 @@ class Vehicle
     // Set de l'ID de la table vehicles
     public function set_Id_vehicles(int $id_vehicles)
     {
-        $this->id_vehicles=$id_vehicles;
-    }
-    
-    public function get_brand() : string
-    {
-        return $this->brand;
-    } 
-    public function set_brand(string $brand)
-    {
-        $this->brand=$brand;
+        $this->id_vehicles = $id_vehicles;
     }
 
-    public function get_model() :string 
+    public function get_brand(): string
+    {
+        return $this->brand;
+    }
+    public function set_brand(string $brand)
+    {
+        $this->brand = $brand;
+    }
+
+    public function get_model(): string
     {
         return $this->model;
     }
     public function set_model(string $model)
     {
-        $this->model= $model;
+        $this->model = $model;
     }
 
-    public function get_registration() : string
+    public function get_registration(): string
     {
         return $this->registration;
     }
@@ -54,77 +53,82 @@ class Vehicle
         $this->registration = $registration;
     }
 
-    public function get_mileage() : int
+    public function get_mileage(): int
     {
         return $this->mileage;
     }
     public function set_mileage(int $mileage)
     {
-        $this->mileage= $mileage;
+        $this->mileage = $mileage;
     }
 
-    public function get_picture() : string
+    public function get_picture(): ?string
     {
         return $this->picture;
     }
-    public function set_picture(string $picture)
+    public function set_picture(?string $picture)
     {
-        $this->picture=$picture;
+        $this->picture = $picture;
     }
 
-    public function get_created_at() : DateTime
+    public function get_created_at(): DateTime
     {
         return $this->created_at;
     }
     public function set_created_at(DateTime $created_at)
     {
-        $this->created_at= $created_at;
+        $this->created_at = $created_at;
     }
 
-    public function get_updated_at() : DateTime
+    public function get_updated_at(): DateTime
     {
         return $this->updated_at;
     }
-    public function set_updated_at(DateTime $updated_at)
+    public function set_updated_at(?DateTime $updated_at)
     {
-        $this->updated_at= $updated_at;
+        $this->updated_at = $updated_at;
     }
 
-    public function get_deleted_at() : DateTime
+    public function get_deleted_at(): ?DateTime
     {
         return $this->deleted_at;
     }
-    public function set_deleted_at(DateTime $deleted_at)
+    public function set_deleted_at(?DateTime $deleted_at)
     {
-        $this->deleted_at= $deleted_at;
+        $this->deleted_at = $deleted_at;
     }
 
-    public function get_id_types () : int
+    public function get_id_types(): int
     {
         return $this->id_types;
     }
-    
+
     public function set_id_types(int $id_types)
     {
-        $this->id_types=$id_types;
+        $this->id_types = $id_types;
     }
 
-    public static function get_all() : array
+    public static function get_all($order): array
     {
         $pdo = connect();
-        $sql = 'SELECT * FROM `vehicles`;';
+        $sql = "SELECT * 
+        FROM `vehicles` 
+        INNER JOIN `types` ON `vehicles`.`id_types` = `types`.`id_types`
+        WHERE `vehicles` . `deleted_at` IS NULL 
+        ORDER BY `vehicles`. `brand` $order ;";
         $sth = $pdo->query($sql);
+        $sth->execute();
         $result = $sth->fetchAll();
 
         return $result;
     }
-    public function insert() :bool 
+    public function insert(): bool
     {
         $pdo = connect();
         $sql = "INSERT INTO `vehicles` (`brand`, `model`, `registration`, `mileage`, `picture`, `id_types`) 
-        VALUE (:brand, :model, :registration, :mileage, :picture, :id_types);";
+        VALUES (:brand, :model, :registration, :mileage, :picture, :id_types);";
         $sth = $pdo->prepare($sql);
-        
+
         $sth->bindValue(':brand', $this->get_brand());
         $sth->bindValue(':model', $this->get_model());
         $sth->bindValue(':registration', $this->get_registration());
@@ -134,6 +138,91 @@ class Vehicle
         $result = $sth->execute();
 
         return $result;
-
     }
-} 
+
+    public static function get(int $id_vehicles): object
+    {
+        $pdo = connect();
+        $sql = 'SELECT * FROM `vehicles` WHERE `id_vehicles` = :id_vehicles ;';
+        $sth = $pdo->prepare($sql);
+        $sth->bindValue(':id_vehicles', $id_vehicles, PDO::PARAM_INT);
+        $sth->execute();
+        $result = $sth->fetch();
+
+        return $result;
+    }
+
+    public function update() : bool
+    {
+        $pdo = connect();
+        $sql = "UPDATE `vehicles` 
+        SET `brand` = :brand, 
+        `model` = :model,
+        `registration`= :registration,
+        `mileage` = :mileage, 
+        `picture` =:picture,
+        `id_types` = :id_types
+        WHERE `id_vehicles`= :id_vehicles;";
+        $sth= $pdo->prepare($sql);
+        $sth->bindValue(':id_vehicles', $this->get_id_vehicles(), PDO::PARAM_INT);
+        $sth->bindValue(':brand', $this->get_brand());
+        $sth->bindValue(':model', $this->get_model());
+        $sth->bindValue(':registration', $this->get_registration());
+        $sth->bindValue(':mileage', $this->get_mileage(), PDO::PARAM_INT);
+        $sth->bindValue(':picture', $this->get_picture());
+        $sth->bindValue(':id_types', $this->get_id_types(), PDO::PARAM_INT);
+        return $sth->execute();
+    }
+
+    public static function archive(int $id_vehicles) : bool
+    {
+        $pdo = connect();
+        $sql= "UPDATE `vehicles`
+        SET `deleted_at` = NOW() 
+        WHERE `id_vehicles` = :id_vehicles ;";
+        $sth= $pdo->prepare($sql);
+        $sth->bindValue(':id_vehicles', $id_vehicles);
+        $sth->execute();
+
+        return (bool) $sth->rowCount();
+    }
+
+    public static function get_archive(string $order) : array
+    {
+        $pdo =connect();
+        $sql = "SELECT *
+        FROM `vehicles` 
+        INNER JOIN `types` ON `vehicles`.`id_types` = `types`. `id_types`
+        WHERE `vehicles` . `deleted_at` IS NOT NULL 
+        ORDER BY `vehicles` . `brand` $order ;";
+        $sth = $pdo->prepare($sql);
+        $sth->execute();
+        $result = $sth->fetchAll();
+
+        return $result;
+    }
+
+    public static function restore(string $order) :array
+    {
+    
+        $pdo = connect();
+        $sql = "SELECT `vehicles`. *, `types`. `type`
+        FROM `vehicles`
+        INNER JOIN `types` 
+        ON `vehicles`. `id_vehicles` = `types`. `id_types`
+        WHERE `deleted_at` IS NULL 
+        ORDER BY `types`. `type`, `vehicles`.$order ;";
+        $sth= $pdo->prepare($sql);
+        $sth->execute();
+        $result = $sth->fetchAll();
+
+        return $result;
+    }
+
+    // public static function delete(int $id_vehicles) : bool{
+    //     $pdo = connect();
+    //     $sql = 'DELETE FROM `vehicles` WHERE `id_vehicles` = :id_vehicles;';
+    //     $sth = $pdo->prepare($sql);
+    //     $sth-> bindValue(':id_vehicles', $id_vehicles, PDO::PARAM_INT);
+    // }
+}

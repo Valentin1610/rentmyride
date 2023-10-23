@@ -1,6 +1,6 @@
 <h2 class="text-center">Liste de toutes les catégories</h2>
 
-<table class="m-0 mt-5">
+<table class="m-0 mt-5 table">
     <thead>
         <tr>
             <th>Id</th>
@@ -13,7 +13,7 @@
         <?php foreach ($types as $type) { ?>
         <tr>
             <td><?= $type->id_types ?></td>
-            <td id="listTable"><?= $type->type ?></td>
+            <td><?= $type->type ?></td>
             <td>
                 <a href="/controllers/dashboard/types/update_types-ctrl.php?id_types=<?= $type->id_types ?>">
                     <i class="fa-solid fa-screwdriver-wrench text-black"></i>

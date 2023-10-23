@@ -50,11 +50,13 @@ class Type
 
         return (bool) $result;
     }
+
+    
     
     public static function getAll(): array
     {
         $pdo = connect();
-        $sql = 'SELECT `type`, `id_types` FROM `types`;';
+        $sql = 'SELECT * FROM `types` ORDER BY `type`;';
         $sth = $pdo->query($sql);
         $datas = $sth->fetchAll();
 

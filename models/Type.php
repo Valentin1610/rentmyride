@@ -41,7 +41,7 @@ class Type
 
     public static function isExist(string $type): bool 
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "SELECT * FROM `types` WHERE `type` = :type ;";
         $sth = $pdo->prepare($sql);
         $sth->bindValue(':type', $type);
@@ -53,7 +53,7 @@ class Type
     
     public static function getAll(): array
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = 'SELECT * FROM `types` ORDER BY `type`;';
         $sth = $pdo->query($sql);
         $datas = $sth->fetchAll();
@@ -63,7 +63,7 @@ class Type
 
     public static function get(int $id_types): object
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = 'SELECT * FROM `types` WHERE `id_types` = :id_type ;';
         $sth = $pdo->prepare($sql);
         $sth->bindValue(':id_type', $id_types, PDO::PARAM_INT);
@@ -75,7 +75,7 @@ class Type
 
     public function update() : bool
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = 'UPDATE `types` SET `type` = :type WHERE `id_types` = :id_types ;';
         $sth = $pdo->prepare($sql);
         $sth->bindValue(':type', $this->get_type(), PDO::PARAM_STR);
@@ -86,7 +86,7 @@ class Type
 
     public static function delete(int $id_types) : bool
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = 'DELETE FROM `types` WHERE `id_types` = ?;';
         $sth = $pdo->prepare($sql);
         $sth->execute([$id_types]);

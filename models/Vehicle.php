@@ -111,7 +111,7 @@ class Vehicle
     public static function get_all(string $order = "ASC", int $id_types = 0, string $searchs = '', int $page = 1, bool $all = false): array
     {
         $offset = ($page - 1) * NB_ELEMENTS_PER_PAGE;
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "SELECT * 
         FROM `vehicles` 
         INNER JOIN `types` ON `vehicles`.`id_types` = `types`.`id_types`
@@ -149,7 +149,7 @@ class Vehicle
     }
     public function insert(): bool
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "INSERT INTO `vehicles` (`brand`, `model`, `registration`, `mileage`, `picture`, `id_types`) 
         VALUES (:brand, :model, :registration, :mileage, :picture, :id_types);";
         $sth = $pdo->prepare($sql);
@@ -167,7 +167,7 @@ class Vehicle
 
     public static function get(int $id_vehicles): object
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = 'SELECT * FROM `vehicles` WHERE `id_vehicles` = :id_vehicles ;';
         $sth = $pdo->prepare($sql);
         $sth->bindValue(':id_vehicles', $id_vehicles, PDO::PARAM_INT);
@@ -179,7 +179,7 @@ class Vehicle
 
     public function update(): bool
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "UPDATE `vehicles` 
         SET `brand` = :brand, 
         `model` = :model,
@@ -201,7 +201,7 @@ class Vehicle
 
     public static function archive(int $id_vehicles): bool
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "UPDATE `vehicles`
         SET `deleted_at` = NOW() 
         WHERE `id_vehicles` = :id_vehicles ;";
@@ -214,7 +214,7 @@ class Vehicle
 
     public static function get_archive(string $order): array
     {
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "SELECT *
         FROM `vehicles` 
         INNER JOIN `types` ON `vehicles`.`id_types` = `types`. `id_types`
@@ -230,7 +230,7 @@ class Vehicle
     public static function restore(string $order): array
     {
 
-        $pdo = connect();
+        $pdo = Database::connect();
         $sql = "SELECT `vehicles`. *, `types`. `type`
         FROM `vehicles`
         INNER JOIN `types` 

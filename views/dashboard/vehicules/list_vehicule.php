@@ -25,7 +25,7 @@
                 <th>Kilométrage</th>
                 <th>Image</th>
                 <th>Modifier</th>
-                <th>Archiver</th>
+                <th>Supprimer</th>
             </tr>
         </thead>
         <tbody>
@@ -37,7 +37,10 @@
                     <td><?= $vehicle->model ?></td>
                     <td><?= $vehicle->registration ?></td>
                     <td><?= $vehicle->mileage ?></td>
-                    <td><?= $vehicle->picture ?></td>
+                    <td><?php if (isset($vehicle->picture)) { ?>
+                            <a href="/public/uploads/vehicles/<?= $vehicle->picture ?>" target="_blank"><i class="fa-solid fa-image"></i></a>
+                        <?php } ?>
+                    </td>
                     <td>
                         <a href="/controllers/dashboard/vehicules/modifies_vehicules-ctrl.php?id_vehicles=<?= $vehicle->id_vehicles ?>">
                             <i class="fa-solid fa-screwdriver-wrench text-black"></i>
@@ -45,7 +48,7 @@
                     </td>
                     <td>
                         <a href="/controllers/dashboard/vehicules/archive_vehicules-ctrl.php?id_vehicles=<?= $vehicle->id_vehicles ?>">
-                            <i class="fa-solid fa-box-archive"></i>
+                            <i class="fa-solid fa-box-archive"></
                         </a>
                     </td>
                 </tr>

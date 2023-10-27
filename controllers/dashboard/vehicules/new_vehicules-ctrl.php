@@ -12,6 +12,7 @@ try {
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $picture= $_FILES['picture'];
+        
         $brand = filter_input(INPUT_POST, 'brand', FILTER_SANITIZE_SPECIAL_CHARS);
         if (empty($brand)) {
             $errors['brand'] = 'Veuillez entrez obligatoirement une marque de véhicule';
